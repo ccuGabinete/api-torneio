@@ -20,11 +20,11 @@ module.exports.salvarInscrito = (req, res, next) => {
         .then(pool => {
             return pool.request()
                 .input('NomeInscrito', cnn.sql.VarChar(255), req.body.NomeInscrito)
-                .input('DataNascimento', cnn.sql.Date, req.body.DataNascimento)
+                .input('DataNascimento', cnn.sql.VarChar(20), req.body.DataNascimento)
                 .input('NickName', cnn.sql.VarChar(255), req.body.NickName)
                 .input('Email', cnn.sql.VarChar(255), req.body.Email)
                 .input('IDEquipe', cnn.sql.Int, req.body.IDEquipe)
-                .input('CPF', cnn.sql.VarChar(255), req.body.CPF)
+                .input('CPF', cnn.sql.VarChar(25), req.body.CPF)
                 .query("insert into Inscritos(NomeInscrito, DataNascimento, NickName, Email, IDEquipe, CPF) values (@NomeInscrito, @DataNascimento, @NickName, @Email, @IDEquipe, @CPF)");
         })
         .then(result => {
@@ -33,6 +33,7 @@ module.exports.salvarInscrito = (req, res, next) => {
         })
         .catch(err => {
             sendJsonResponse(res, 404, err);
+            console.log(err);
             return cnn.sql.close();
         })
 }

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const inscrito = require('../controllerjs/InscritoController')
 
+
 /* GET home page. */
 router.post('/salvar/inscrito', inscrito.salvarInscrito);
 router.post('/salvar/equipe', inscrito.salvarEquipe);
