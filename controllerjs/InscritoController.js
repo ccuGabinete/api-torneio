@@ -161,8 +161,6 @@ module.exports.getCPF = (req, res, next) => {
         })
 }
 
-
-
 module.exports.sendEmail = (req, res, next) => {
     async function main() {
 
@@ -194,5 +192,37 @@ module.exports.sendEmail = (req, res, next) => {
         )
         .catch(err => sendJsonResponse(res, 404, { response: err }));
 
+}
+
+module.exports.getEmail = (req, res, next) => {
+    let equipes = [];
+
+
+    cnn.sql.on('error', err => {
+        sendJsonResponse(res, 401, {
+            msg: 'Falha na obtenção do recurso'
+        })
+    })
+
+
+    cnn.sql.connect(cnn.config)
+        .then(pool => {
+            let data = pool.request()
+                .input('Email', cnn.sql.VarChar(255), req.body.email)
+                .query("select COUNT(Email) as Total from Inscritos where Email = @Email");
+
+            return data;
+        })
+        .then(data => {
+            for (let i = 0; i < data.rowsAffected; i++) {
+                equipes.push(data.recordset[i]);
+            }
+            sendJsonResponse(res, 200, equipes);
+            return cnn.sql.close();
+        })
+        .catch(err => {
+            sendJsonResponse(res, 404, err);
+            return cnn.sql.close();
+        })
 }
 

@@ -12,5 +12,6 @@ router.post('/email/send', inscrito.sendEmail);
 router.get('/listar/equipes', inscrito.listarEquipes);
 router.get('/listar/inscritos', inscrito.listarInscritos);
 router.post('/buscar/CEP', cep.buscarCEP);
+router.post('/buscar/email', inscrito.getEmail);
 
 module.exports = router;
