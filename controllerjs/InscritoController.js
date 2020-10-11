@@ -28,7 +28,7 @@ module.exports.salvarInscrito = (req, res, next) => {
                 .input('IDEquipe', cnn.sql.Int, req.body.IDEquipe)
                 .input('CPF', cnn.sql.VarChar(25), req.body.CPF)
                 .input('CEP', cnn.sql.VarChar(25), req.body.CEP)
-                .query("insert into Inscritos(NomeInscrito, DataNascimento, NickName, Email, IDEquipe, CPF) values (@NomeInscrito, @DataNascimento, @NickName, @Email, @IDEquipe, @CPF)");
+                .query("insert into Inscritos(NomeInscrito, DataNascimento, NickName, Email, IDEquipe, CPF, CEP) values (@NomeInscrito, @DataNascimento, @NickName, @Email, @IDEquipe, @CPF, @CEP)");
         })
         .then(result => {
             sendJsonResponse(res, 200, result);
