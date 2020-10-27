@@ -1,12 +1,42 @@
 const cnn = require('../db/sqlserver');
 require('dotenv').config()
-const f = console.log;
 
 var sendJsonResponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 }
 
+module.exports.listarTorneios = (req, res, next) => {
+    let torneios = [];
+
+
+    cnn.sql.on('error', err => {
+        sendJsonResponse(res, 401, {
+            msg: 'Falha na obtenção do recurso'
+        })
+    })
+
+
+    cnn.sql.connect(cnn.config)
+        .then(pool => {
+            let data = pool.request()
+            .input('IDStatusTorneio', cnn.sql.Int, parseInt(req.body.IDStatusTorneio))
+            .query("select * from Torneios where IDStatusTorneio = @IDStatusTorneio");
+
+            return data;
+        })
+        .then(data => {
+            for (let i = 0; i < data.rowsAffected; i++) {
+                torneios.push(data.recordset[i]);
+            }
+            sendJsonResponse(res, 200, torneios);
+            return cnn.sql.close();
+        })
+        .catch(err => {
+            sendJsonResponse(res, 404, err);
+            return cnn.sql.close();
+        })
+}
 
 module.exports.salvarTorneio = (req, res, next) => {
     cnn.sql.on('error', err => {

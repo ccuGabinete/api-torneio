@@ -1,18 +1,14 @@
-const { query } = require('express');
 const cnn = require('../db/sqlserver');
 const nodemailer = require("nodemailer");
-const { pool } = require('mssql');
 require('dotenv').config()
-const f = console.log;
 
 var sendJsonResponse = function (res, status, content) {
     res.status(status);
     res.json(content);
 }
 
-
-module.exports.salvarInscrito = (req, res, next) => {
-    cnn.sql.on('error', err => {
+module.exports.salvarInscrito = (req, res) => {
+    cnn.sql.on('error', () => {
         sendJsonResponse(res, 401, {
             msg: 'Falha na obtenção do recurso'
         })
@@ -41,11 +37,11 @@ module.exports.salvarInscrito = (req, res, next) => {
         })
 }
 
-module.exports.listarInscritos = (req, res, next) => {
+module.exports.listarInscritos = (req, res) => {
     let equipes = [];
 
 
-    cnn.sql.on('error', err => {
+    cnn.sql.on('error', () => {
         sendJsonResponse(res, 401, {
             msg: 'Falha na obtenção do recurso'
         })
@@ -72,8 +68,8 @@ module.exports.listarInscritos = (req, res, next) => {
         })
 }
 
-module.exports.salvarEquipe = (req, res, next) => {
-    cnn.sql.on('error', err => {
+module.exports.salvarEquipe = (req, res) => {
+    cnn.sql.on('error', () => {
         sendJsonResponse(res, 401, {
             msg: 'Falha na obtenção do recurso'
         })
@@ -82,12 +78,12 @@ module.exports.salvarEquipe = (req, res, next) => {
     cnn.sql.connect(cnn.config)
         .then(pool => {
             return pool.request()
-                .input('IDTipoEquipe', cnn.sql.Int, req.body.IDTipoEquipe)
+
                 .input('NomeEquipe', cnn.sql.VarChar(255), req.body.NomeEquipe.toUpperCase())
                 .input('CEP', cnn.sql.VarChar(25), req.body.CEP)
                 .query("insert into Equipes(IDTipoEquipe, NomeEquipe, CEP) values (@IDTipoEquipe, @NomeEquipe, @CEP)");
         })
-        .then(result => {
+        .then(() => {
             cnn.sql.connect(cnn.config)
                 .then(pool => {
                     return pool.request()
@@ -113,11 +109,11 @@ module.exports.salvarEquipe = (req, res, next) => {
         })
 }
 
-module.exports.listarEquipes = (req, res, next) => {
+module.exports.listarEquipes = (req, res) => {
     let equipes = [];
 
 
-    cnn.sql.on('error', err => {
+    cnn.sql.on('error', () => {
         sendJsonResponse(res, 401, {
             msg: 'Falha na obtenção do recurso'
         })
@@ -144,11 +140,11 @@ module.exports.listarEquipes = (req, res, next) => {
         })
 }
 
-module.exports.listarMesas = (req, res, next) => {
+module.exports.listarMesas = (req, res) => {
     let mesas = [];
 
 
-    cnn.sql.on('error', err => {
+    cnn.sql.on('error', () => {
         sendJsonResponse(res, 401, {
             msg: 'Falha na obtenção do recurso'
         })
@@ -158,7 +154,7 @@ module.exports.listarMesas = (req, res, next) => {
     cnn.sql.connect(cnn.config)
         .then(pool => {
             let data = pool.request()
-                .query("select * from Mesas where IDStatusMesa = 1 order by IDMesa");
+                .query("select * from Mesas");
 
             return data;
         })
@@ -175,11 +171,11 @@ module.exports.listarMesas = (req, res, next) => {
         })
 }
 
-module.exports.listarJogadores = (req, res, next) => {
+module.exports.listarJogadores = (req, res) => {
     let jogadores = [];
 
 
-    cnn.sql.on('error', err => {
+    cnn.sql.on('error', () => {
         sendJsonResponse(res, 401, {
             msg: 'Falha na obtenção do recurso'
         })
@@ -190,7 +186,7 @@ module.exports.listarJogadores = (req, res, next) => {
         .then(pool => {
             let data = pool.request()
                 .input('IDTorneio', cnn.sql.Int, req.body.IDTorneio)
-                .query("select * from Jogadores where IDTorneio = @IDTorneio");
+                .query("select A.*, b.NickName from Jogadores as A inner join Inscritos as B on A.IDInscrito = B.IDInscrito where IDTorneio = @IDTorneio");
 
             return data;
         })
@@ -207,11 +203,11 @@ module.exports.listarJogadores = (req, res, next) => {
         })
 }
 
-module.exports.getCPF = (req, res, next) => {
+module.exports.getCPF = (req, res) => {
     let equipes = [];
 
 
-    cnn.sql.on('error', err => {
+    cnn.sql.on('error', () => {
         sendJsonResponse(res, 401, {
             msg: 'Falha na obtenção do recurso'
         })
@@ -239,7 +235,7 @@ module.exports.getCPF = (req, res, next) => {
         })
 }
 
-module.exports.sendEmail = (req, res, next) => {
+module.exports.sendEmail = (req, res) => {
     async function main() {
 
         let transporter = nodemailer.createTransport({
@@ -253,13 +249,6 @@ module.exports.sendEmail = (req, res, next) => {
         });
 
 
-        let info = await transporter.sendMail({
-            from: '"LCS" <admin@ligadoscampeoesdasinuca.com>',
-            to: req.body.destino,
-            subject: "Confirmação de Inscrição  ✔",
-            text: req.body.msg,
-            html: "<b>" + req.body.msg + "</b>"
-        });
 
 
     }
@@ -272,11 +261,11 @@ module.exports.sendEmail = (req, res, next) => {
 
 }
 
-module.exports.getEmail = (req, res, next) => {
+module.exports.getEmail = (req, res) => {
     let equipes = [];
 
 
-    cnn.sql.on('error', err => {
+    cnn.sql.on('error', () => {
         sendJsonResponse(res, 401, {
             msg: 'Falha na obtenção do recurso'
         })
@@ -287,7 +276,7 @@ module.exports.getEmail = (req, res, next) => {
         .then(pool => {
             let data = pool.request()
                 .input('Email', cnn.sql.VarChar(255), req.body.email)
-                .query("select COUNT(Email) as Total from Inscritos where Email = @Email");
+                .query("select COUNT(Email) as Total, IDinscrito  from Inscritos where Email = @Email group by IDInscrito");
 
             return data;
         })
@@ -303,3 +292,141 @@ module.exports.getEmail = (req, res, next) => {
             return cnn.sql.close();
         })
 }
+
+module.exports.limparMesas = (req, res) => {
+    cnn.sql.on('error', () => {
+        sendJsonResponse(res, 401, {
+            msg: 'Falha na obtenção do recurso'
+        })
+    })
+
+    cnn.sql.connect(cnn.config)
+        .then(pool => {
+            let data = pool.request()
+                .input('IDTorneio', cnn.sql.Int, req.params.idtorneio)
+                .query("delete JogadorMesa from JogadorMesa as A inner join Jogadores as B on A.IDJogador = B.IDJogador where b.IDTorneio = @IDTorneio");
+
+            return data;
+        })
+        .then(data => {
+
+            sendJsonResponse(res, 200, {
+                linhasafetadas: data.rowsAffected
+            });
+
+            return cnn.sql.close();
+        })
+        .catch(err => {
+            sendJsonResponse(res, 404, err);
+            return cnn.sql.close();
+        })
+
+}
+
+module.exports.povoarMesas = (req, res) => {
+
+
+    cnn.sql.on('error', () => {
+        sendJsonResponse(res, 401, {
+            msg: 'Falha na obtenção do recurso'
+        })
+    })
+
+    cnn.sql.connect(cnn.config)
+        .then(pool => {
+            let data = pool.request()
+                .input('IDJogador', cnn.sql.Int, req.params.idjogador)
+                .input('IDMesa', cnn.sql.Int, req.params.idmesa)
+                .input('IDTorneio', cnn.sql.Int, req.params.idtorneio)
+                .input('NickName', cnn.sql.VarChar(255), req.params.NickName)
+                .query("insert into JogadorMesa(IDJogador, IDMesa, IDTorneio, NickName) values (@IDJogador, @IDMesa, @IDTorneio, @NickName)");
+
+            return data;
+        })
+        .then(data => {
+
+            sendJsonResponse(res, 200, {
+                linhasafetadas: data.rowsAffected
+            });
+
+            return cnn.sql.close();
+        })
+        .catch(err => {
+            sendJsonResponse(res, 404, err);
+            return cnn.sql.close();
+        })
+}
+
+module.exports.listarJogadoresMesas = (req, res) => {
+    let jogadores = [];
+
+
+    cnn.sql.on('error', () => {
+        sendJsonResponse(res, 401, {
+            msg: 'Falha na obtenção do recurso'
+        })
+    })
+
+
+    cnn.sql.connect(cnn.config)
+        .then(pool => {
+            let data = pool.request()
+                .input('IDTorneio', cnn.sql.Int, req.body.IDTorneio)
+                .query("select B.IDJogador, C.NomeInscrito, C.NickName, B.IDMesa, A.Vidas from Jogadores as A inner join JogadorMesa as B on A.IDJogador = B.IDJogador inner join Inscritos as C on A.IDInscrito = C.IDInscrito where A.Vidas > 0 AND A.IDTorneio = @IDTorneio  order by A.IDJogador");
+
+            return data;
+        })
+        .then(data => {
+            for (let i = 0; i < data.rowsAffected; i++) {
+                jogadores.push(data.recordset[i]);
+            }
+            sendJsonResponse(res, 200, jogadores);
+            return cnn.sql.close();
+        })
+        .catch(err => {
+            sendJsonResponse(res, 404, err);
+            return cnn.sql.close();
+        })
+}
+
+module.exports.buscarJogador = (req, res) => {
+    let jogadores = [];
+
+    console.log(req.params);
+
+    cnn.sql.on('error', () => {
+        sendJsonResponse(res, 401, {
+            msg: 'Falha na obtenção do recurso'
+        })
+    })
+  
+    cnn.sql.connect(cnn.config)
+        .then(pool => {
+            let data = pool.request()
+                .input('IDTorneio', cnn.sql.Int, parseInt(req.body.IDTorneio))
+                .input('IDInscrito', cnn.sql.Int, parseInt(req.body.IDInscrito))
+                .query("select count(A.IDInscrito) as TOTAL from Jogadores as A where IDInscrito = @IDInscrito and IDTorneio = @IDTorneio");
+
+            return data;
+        })
+        .then(data => {
+            for (let i = 0; i < data.rowsAffected; i++) {
+                jogadores.push(data.recordset[i]);
+            }
+            sendJsonResponse(res, 200, jogadores);
+            return cnn.sql.close();
+        })
+        .catch(err => {
+            sendJsonResponse(res, 404, err);
+            return cnn.sql.close();
+        })
+}
+
+
+
+
+
+
+
+
+
