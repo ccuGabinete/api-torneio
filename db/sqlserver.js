@@ -10,7 +10,6 @@ const config = {
     port: 1433
 };
 
-
 module.exports = {
     sql: sql,
     config: config
