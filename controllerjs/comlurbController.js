@@ -137,8 +137,6 @@ module.exports.getEtiqueta = (req, res) => {
     });
   });
 
-  console.log(req.body);
-
   cnn.sql
     .connect(cnn.config)
     .then((pool) => {
@@ -146,7 +144,7 @@ module.exports.getEtiqueta = (req, res) => {
         .request()
         .input("etiqueta", cnn.sql.VarChar(255), req.body.etiqueta)
         .query(
-          "SELECT E.Empresa, E.cnpj, B.identificacao FROM Empresas E INNER JOIN ETIQUETAS B ON E.id = B.idEmpresa WHERE B.identificacao = @etiqueta"
+          "SELECT B.id, E.Empresa, E.cnpj, B.identificacao FROM Empresas E INNER JOIN ETIQUETAS B ON E.id = B.idEmpresa WHERE B.identificacao = @etiqueta"
         );
 
       return data;
@@ -164,6 +162,45 @@ module.exports.getEtiqueta = (req, res) => {
     })
     .catch((err) => {
       sendJsonResponse(res, 500, "error 4");
+      return cnn.sql.close();
+    });
+};
+
+
+module.exports.leitura = (req, res) => {
+  cnn.sql.on("error", () => {
+    sendJsonResponse(res, 500, {
+      msg: "error 5",
+    });
+  });
+
+  cnn.sql
+    .connect(cnn.config)
+    .then((pool) => {
+      let data = pool
+        .request()
+        .input("idEtiqueta", cnn.sql.Int, req.body.idEtiqueta)
+        .input("idColaborador", cnn.sql.Int, req.body.idEtiqueta)
+        .query(
+          "INSERT INTO Leitura(idEtiqueta, idColaborador) VALUES(@idEtiqueta , @idColaborador)"
+        );
+
+      return data;
+
+    })
+    .then((data) => {
+      if(data.rowsAffected.length > 0){
+        sendJsonResponse(res, 200, data.rowsAffected);
+        return cnn.sql.close();
+      } else {
+        sendJsonResponse(res, 404, {});
+        return cnn.sql.close();
+      }
+      
+    })
+    .catch((err) => {
+      sendJsonResponse(res, 500, "error 4");
+      console.log(err);
       return cnn.sql.close();
     });
 };
