@@ -180,7 +180,7 @@ module.exports.leitura = (req, res) => {
       let data = pool
         .request()
         .input("idEtiqueta", cnn.sql.Int, req.body.idEtiqueta)
-        .input("idColaborador", cnn.sql.Int, req.body.idEtiqueta)
+        .input("idColaborador", cnn.sql.Int, req.body.idColaborador)
         .query(
           "INSERT INTO Leitura(idEtiqueta, idColaborador) VALUES(@idEtiqueta , @idColaborador)"
         );
