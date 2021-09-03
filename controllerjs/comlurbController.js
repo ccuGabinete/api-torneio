@@ -222,8 +222,9 @@ module.exports.recebimento = (req, res) => {
         .input("peso", cnn.sql.VarChar(50), req.body.peso)
         .input("tipo", cnn.sql.VarChar(50), req.body.tipo)
         .input("idColaborador", cnn.sql.Int, req.body.idColaborador)
+        .input("idRecebedor", cnn.sql.Int, req.body.idRecebedor)
         .query(
-          "INSERT INTO Recebimento([latitude], [longitude], [peso], [tipo], [idColaborador]) VALUES (@latitude, @longitude, @peso, @tipo, @idColaborador)"
+          "INSERT INTO Recebimento([latitude], [longitude], [peso], [tipo], [idColaborador], [IdRecebedor]) VALUES (@latitude, @longitude, @peso, @tipo, @idColaborador, @idRecebedor)"
         );
 
       return data;
