@@ -204,3 +204,45 @@ module.exports.leitura = (req, res) => {
       return cnn.sql.close();
     });
 };
+
+module.exports.recebimento = (req, res) => {
+  cnn.sql.on("error", () => {
+    sendJsonResponse(res, 500, {
+      msg: "error 5",
+    });
+  });
+
+  cnn.sql
+    .connect(cnn.config)
+    .then((pool) => {
+      let data = pool
+        .request()
+        .input("latitude", cnn.sql.VarChar(50), req.body.latitude)
+        .input("longitude", cnn.sql.VarChar(50), req.body.longitude)
+        .input("peso", cnn.sql.VarChar(50), req.body.peso)
+        .input("tipo", cnn.sql.VarChar(50), req.body.tipo)
+        .input("idColaborador", cnn.sql.Int, req.body.idColaborador)
+        .query(
+          "INSERT INTO Recebimento([latitude], [longitude], [peso], [tipo], [idColaborador]) VALUES (@latitude, @longitude, @peso, @tipo, @idColaborador)"
+        );
+
+      return data;
+
+    })
+    .then((data) => {
+      if(data.rowsAffected.length > 0){
+        sendJsonResponse(res, 200, data.rowsAffected);
+        return cnn.sql.close();
+      } else {
+        sendJsonResponse(res, 404, {});
+        return cnn.sql.close();
+      }
+      
+    })
+    .catch((err) => {
+      sendJsonResponse(res, 500, "error 4");
+      console.log(err);
+      return cnn.sql.close();
+    });
+};
+

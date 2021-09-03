@@ -13,6 +13,7 @@ router.post('/usuario', comlurb.getUsuario);
 router.post('/salvar', comlurb.salvar);
 router.post('/etiqueta', comlurb.getEtiqueta);
 router.post('/leitura', comlurb.leitura);
+router.post('/recebimento', comlurb.recebimento);
 
 /* GET home page. */
 // router.get('/limpar/mesas/:idtorneio', inscrito.limparMesas);
