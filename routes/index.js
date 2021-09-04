@@ -14,6 +14,8 @@ router.post('/salvar', comlurb.salvar);
 router.post('/etiqueta', comlurb.getEtiqueta);
 router.post('/leitura', comlurb.leitura);
 router.post('/recebimento', comlurb.recebimento);
+router.post('/empresa/etiquetas', comlurb.etiquetasPorEmpresa);
+
 
 /* GET home page. */
 // router.get('/limpar/mesas/:idtorneio', inscrito.limparMesas);

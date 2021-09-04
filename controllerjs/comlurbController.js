@@ -89,7 +89,7 @@ module.exports.getUsuario = (req, res) => {
         .request()
         .input("usuario", cnn.sql.VarChar(255), req.body.usuario)
         .query(
-          "select id, usuario, senha, grupo from login where usuario = @usuario"
+          "select id, usuario, senha, grupo, idEmpresa from login where usuario = @usuario"
         );
 
       return data;
@@ -148,24 +148,21 @@ module.exports.getEtiqueta = (req, res) => {
         );
 
       return data;
-
     })
     .then((data) => {
-      if(data.recordset.length > 0){
+      if (data.recordset.length > 0) {
         sendJsonResponse(res, 200, data.recordset);
         return cnn.sql.close();
       } else {
         sendJsonResponse(res, 404, {});
         return cnn.sql.close();
       }
-      
     })
     .catch((err) => {
       sendJsonResponse(res, 500, "error 4");
       return cnn.sql.close();
     });
 };
-
 
 module.exports.leitura = (req, res) => {
   cnn.sql.on("error", () => {
@@ -186,17 +183,15 @@ module.exports.leitura = (req, res) => {
         );
 
       return data;
-
     })
     .then((data) => {
-      if(data.rowsAffected.length > 0){
+      if (data.rowsAffected.length > 0) {
         sendJsonResponse(res, 200, data.rowsAffected);
         return cnn.sql.close();
       } else {
         sendJsonResponse(res, 404, {});
         return cnn.sql.close();
       }
-      
     })
     .catch((err) => {
       sendJsonResponse(res, 500, "error 4");
@@ -228,17 +223,15 @@ module.exports.recebimento = (req, res) => {
         );
 
       return data;
-
     })
     .then((data) => {
-      if(data.rowsAffected.length > 0){
+      if (data.rowsAffected.length > 0) {
         sendJsonResponse(res, 200, data.rowsAffected);
         return cnn.sql.close();
       } else {
         sendJsonResponse(res, 404, {});
         return cnn.sql.close();
       }
-      
     })
     .catch((err) => {
       sendJsonResponse(res, 500, "error 4");
@@ -247,3 +240,37 @@ module.exports.recebimento = (req, res) => {
     });
 };
 
+module.exports.etiquetasPorEmpresa = (req, res) => {
+  cnn.sql.on("error", () => {
+    sendJsonResponse(res, 500, {
+      msg: "error 5",
+    });
+  });
+
+  cnn.sql
+    .connect(cnn.config)
+    .then((pool) => {
+      let data = pool
+        .request()
+        .input("id", cnn.sql.Int, req.body.id)
+        .query(
+          "select CONCAT('Etiqueta: ', b.identificacao, '  as  ', FORMAT( DATEADD(HOUR, -3, a.data), 'dd/MM/yyyy hh:mm:ss', 'en-US' )) from Leitura a inner join Etiquetas b on a.idEtiqueta = b.id inner join Empresas c on b.idEmpresa = c.id where c.id = @id"
+        );
+
+      return data;
+    })
+    .then((data) => {
+      if (data.recordset.length > 0) {
+        sendJsonResponse(res, 200, data.recordset);
+        return cnn.sql.close();
+      } else {
+        sendJsonResponse(res, 404, {});
+        return cnn.sql.close();
+      }
+    })
+    .catch((err) => {
+      sendJsonResponse(res, 500, "error 4");
+      console.log(err);
+      return cnn.sql.close();
+    });
+};
