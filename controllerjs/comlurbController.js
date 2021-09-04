@@ -266,7 +266,7 @@ module.exports.etiquetasPorEmpresa = (req, res) => {
         sendJsonResponse(res, 200, data.recordset);
         return cnn.sql.close();
       } else {
-        sendJsonResponse(res, 404, {});
+        sendJsonResponse(res, 200, {leitura: ''});
         return cnn.sql.close();
       }
     })
