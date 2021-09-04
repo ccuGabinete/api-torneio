@@ -110,6 +110,8 @@ module.exports.getUsuario = (req, res) => {
                 id: data["id"],
                 usuario: data["usuario"],
                 grupo: data["grupo"],
+                senha: data['senha'],
+                idEmpresa: data["idEmpresa"]
               };
 
               sendJsonResponse(res, 200, obj);
