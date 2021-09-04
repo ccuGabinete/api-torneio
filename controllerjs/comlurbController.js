@@ -256,7 +256,7 @@ module.exports.etiquetasPorEmpresa = (req, res) => {
         .request()
         .input("id", cnn.sql.Int, req.body.id)
         .query(
-          "select CONCAT('Etiqueta: ', b.identificacao, '  as  ', FORMAT( DATEADD(HOUR, -3, a.data), 'dd/MM/yyyy hh:mm:ss', 'en-US' )) from Leitura a inner join Etiquetas b on a.idEtiqueta = b.id inner join Empresas c on b.idEmpresa = c.id where c.id = @id"
+          "select CONCAT('Etiqueta: ', b.identificacao, '  as  ', FORMAT( DATEADD(HOUR, -3, a.data), 'dd/MM/yyyy hh:mm:ss', 'en-US' )) leitura from Leitura a inner join Etiquetas b on a.idEtiqueta = b.id inner join Empresas c on b.idEmpresa = c.id where c.id = @id"
         );
 
       return data;
